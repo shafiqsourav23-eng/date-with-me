@@ -41,34 +41,71 @@
     ];
     let tries = 0;
 
-    function dodge() {
+    // Pop the button out of normal flow so it can be moved freely,
+    // starting from wherever it currently sits.
+    function detach() {
+      if (noBtn.style.position === 'fixed') return;
+      const r = noBtn.getBoundingClientRect();
+      noBtn.style.position = 'fixed';
+      noBtn.style.margin = '0';
+      noBtn.style.left = r.left + 'px';
+      noBtn.style.top = r.top + 'px';
+    }
+
+    // Move the No button as far as possible AWAY from a given point,
+    // keeping it fully on-screen and always clickable-looking (no shrinking).
+    function flee(fromX, fromY) {
+      detach();
+
       tries++;
       hint.textContent = teases[Math.min(tries - 1, teases.length - 1)];
 
-      // Grow the Yes button to make it irresistible.
-      const scale = Math.min(1 + tries * 0.18, 2.6);
+      // Yes grows a little to stay irresistible (capped so it never covers No).
+      const scale = Math.min(1 + tries * 0.06, 1.6);
       yesBtn.style.transform = `scale(${scale})`;
 
-      // Shrink the No button.
-      const noScale = Math.max(1 - tries * 0.08, 0.4);
-      noBtn.style.transform = `scale(${noScale})`;
+      const pad = 16;
+      const w = noBtn.offsetWidth;
+      const h = noBtn.offsetHeight;
+      const maxX = Math.max(window.innerWidth - w - pad, pad);
+      const maxY = Math.max(window.innerHeight - h - pad, pad);
 
-      // Move the No button to a random spot.
-      const padding = 40;
-      const maxX = window.innerWidth - noBtn.offsetWidth - padding;
-      const maxY = window.innerHeight - noBtn.offsetHeight - padding;
-      const x = Math.random() * Math.max(maxX, 0);
-      const y = Math.random() * Math.max(maxY, 0);
-      noBtn.style.position = 'fixed';
+      // Aim for the opposite side of the screen from the cursor, with a
+      // random jump so it's unpredictable. Always lands somewhere reachable.
+      let x = fromX < window.innerWidth / 2
+        ? window.innerWidth - w - pad - Math.random() * 80
+        : pad + Math.random() * 80;
+      let y = fromY < window.innerHeight / 2
+        ? window.innerHeight - h - pad - Math.random() * 80
+        : pad + Math.random() * 80;
+
+      x = Math.min(Math.max(x, pad), maxX);
+      y = Math.min(Math.max(y, pad), maxY);
+
       noBtn.style.left = x + 'px';
       noBtn.style.top = y + 'px';
     }
 
-    noBtn.addEventListener('mouseover', dodge);
-    noBtn.addEventListener('click', dodge);
+    // Proximity guard: the instant the cursor gets near the button, it bolts —
+    // so it can never actually be hovered or clicked. Runs every time, forever.
+    document.addEventListener('mousemove', function (e) {
+      const r = noBtn.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+      if (dist < 90) flee(e.clientX, e.clientY);
+    });
+
+    // Hard fallbacks in case a click/tap ever lands on it.
+    noBtn.addEventListener('mouseover', function (e) { flee(e.clientX, e.clientY); });
+    noBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      flee(e.clientX, e.clientY);
+    });
     noBtn.addEventListener('touchstart', function (e) {
       e.preventDefault();
-      dodge();
+      const t = e.touches[0] || {};
+      flee(t.clientX || window.innerWidth / 2, t.clientY || window.innerHeight / 2);
     }, { passive: false });
   </script>
 </body>
