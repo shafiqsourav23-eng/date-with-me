@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pick our time 💕</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body class="page page-pick">
+  <div class="floating-hearts" aria-hidden="true"></div>
+
+  <main class="card">
+    <div class="emoji-big">⏰</div>
+    <h1>And what time, beautiful?</h1>
+    <p class="subtitle">I'll count every minute until then 💗</p>
+
+    <div class="options" id="timeOptions">
+      <button class="option" data-value="Brunch · 11:00 AM">Brunch · 11:00 AM 🥞</button>
+      <button class="option" data-value="Afternoon · 2:00 PM">Afternoon · 2:00 PM ☕</button>
+      <button class="option" data-value="Sunset Dinner · 7:00 PM">Sunset Dinner · 7:00 PM 🍷</button>
+      <button class="option" data-value="Late night · 9:00 PM">Late night · 9:00 PM 🌌</button>
+    </div>
+
+    <a href="booked.html" class="btn btn-yes btn-next disabled" id="nextBtn">Book it! 💖</a>
+  </main>
+
+  <script src="script.js"></script>
+  <script>
+    setupOptions('timeOptions', 'chosenTime', 'nextBtn');
+  </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>It's a date! 💕</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body class="page page-booked">
+  <div class="floating-hearts" aria-hidden="true"></div>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+  <main class="card">
+    <div class="emoji-big">💑</div>
+    <h1>It's officially a date!</h1>
+    <p class="subtitle">I can't wait, my love 💖</p>
+
+    <div class="ticket">
+      <div class="ticket-row">
+        <span class="ticket-label">Day</span>
+        <span class="ticket-value" id="ticketDate">—</span>
+      </div>
+      <div class="ticket-divider"></div>
+      <div class="ticket-row">
+        <span class="ticket-label">Time</span>
+        <span class="ticket-value" id="ticketTime">—</span>
+      </div>
+      <div class="ticket-divider"></div>
+      <div class="ticket-row">
+        <span class="ticket-label">With</span>
+        <span class="ticket-value">Your favorite person 😘</span>
+      </div>
+    </div>
+
+    <p class="love-note">Thank you for saying yes. You make every day brighter. ❤️</p>
+
+    <a href="index.html" class="btn btn-yes btn-small">Start over 🔁</a>
+  </main>
+
+  <script src="script.js"></script>
+  <script>
+    document.getElementById('ticketDate').textContent =
+      localStorage.getItem('chosenDate') || 'A magical day';
+    document.getElementById('ticketTime').textContent =
+      localStorage.getItem('chosenTime') || 'Anytime with you';
+    launchConfetti();
+  </script>
+</body>
+</html>

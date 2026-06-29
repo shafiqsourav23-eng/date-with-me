@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pick our day 💕</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body class="page page-pick">
+  <div class="floating-hearts" aria-hidden="true"></div>
+
+  <main class="card">
+    <div class="emoji-big">🌸</div>
+    <h1>Yay! Now pick our day</h1>
+    <p class="subtitle">When can I steal you away? 💝</p>
+
+    <div class="options" id="dateOptions">
+      <button class="option" data-value="This Friday">This Friday 🌙</button>
+      <button class="option" data-value="This Saturday">This Saturday ☀️</button>
+      <button class="option" data-value="This Sunday">This Sunday 🥰</button>
+      <button class="option" data-value="Surprise me!">Surprise me! 🎁</button>
+    </div>
+
+    <a href="pick-time.html" class="btn btn-yes btn-next disabled" id="nextBtn">Next 💞</a>
+  </main>
+
+  <script src="script.js"></script>
+  <script>
+    setupOptions('dateOptions', 'chosenDate', 'nextBtn');
+  </script>
+</body>
+</html>
