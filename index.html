@@ -39,64 +39,76 @@
       "Catch me if you can 🏃‍♀️",
       "Just say yes already 😘",
     ];
+    // === No-button: always visible, never selectable (v3) ===
     let tries = 0;
 
     // Pop the button out of normal flow so it can be moved freely,
-    // starting from wherever it currently sits.
+    // starting from exactly where it currently sits.
     function detach() {
       if (noBtn.style.position === 'fixed') return;
       const r = noBtn.getBoundingClientRect();
       noBtn.style.position = 'fixed';
       noBtn.style.margin = '0';
+      noBtn.style.zIndex = '5';
       noBtn.style.left = r.left + 'px';
       noBtn.style.top = r.top + 'px';
     }
 
-    // Move the No button as far as possible AWAY from a given point,
-    // keeping it fully on-screen and always clickable-looking (no shrinking).
+    // Hop the No button a short distance directly AWAY from the cursor.
+    // It stays near the middle of the screen, always full-size and visible —
+    // it just can never be where the cursor is. Never shrinks, never hides.
     function flee(fromX, fromY) {
       detach();
 
       tries++;
       hint.textContent = teases[Math.min(tries - 1, teases.length - 1)];
 
-      // Yes grows a little to stay irresistible (capped so it never covers No).
-      const scale = Math.min(1 + tries * 0.06, 1.6);
-      yesBtn.style.transform = `scale(${scale})`;
-
-      const pad = 16;
       const w = noBtn.offsetWidth;
       const h = noBtn.offsetHeight;
-      const maxX = Math.max(window.innerWidth - w - pad, pad);
-      const maxY = Math.max(window.innerHeight - h - pad, pad);
+      const r = noBtn.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
 
-      // Aim for the opposite side of the screen from the cursor, with a
-      // random jump so it's unpredictable. Always lands somewhere reachable.
-      let x = fromX < window.innerWidth / 2
-        ? window.innerWidth - w - pad - Math.random() * 80
-        : pad + Math.random() * 80;
-      let y = fromY < window.innerHeight / 2
-        ? window.innerHeight - h - pad - Math.random() * 80
-        : pad + Math.random() * 80;
+      // Direction pointing from the cursor to the button = the escape vector.
+      let dx = cx - fromX;
+      let dy = cy - fromY;
+      let len = Math.hypot(dx, dy) || 1;
+      dx /= len;
+      dy /= len;
 
-      x = Math.min(Math.max(x, pad), maxX);
-      y = Math.min(Math.max(y, pad), maxY);
+      // Hop ~180px that way (with a little randomness so it feels alive).
+      const hop = 170 + Math.random() * 60;
+      let x = r.left + dx * hop + (Math.random() - 0.5) * 40;
+      let y = r.top + dy * hop + (Math.random() - 0.5) * 40;
+
+      // Keep it comfortably inside the window, away from the very edges so
+      // it never looks like it vanished into a corner.
+      const margin = 24;
+      const maxX = window.innerWidth - w - margin;
+      const maxY = window.innerHeight - h - margin;
+
+      // If a hop would push it off an edge, bounce it back toward center.
+      if (x < margin || x > maxX) x = window.innerWidth / 2 - w / 2 + (Math.random() - 0.5) * 200;
+      if (y < margin || y > maxY) y = window.innerHeight / 2 - h / 2 + (Math.random() - 0.5) * 200;
+
+      x = Math.min(Math.max(x, margin), maxX);
+      y = Math.min(Math.max(y, margin), maxY);
 
       noBtn.style.left = x + 'px';
       noBtn.style.top = y + 'px';
     }
 
-    // Proximity guard: the instant the cursor gets near the button, it bolts —
-    // so it can never actually be hovered or clicked. Runs every time, forever.
+    // Proximity guard: the instant the cursor gets near, it hops away —
+    // so it can never be hovered or clicked. Runs every time, forever.
     document.addEventListener('mousemove', function (e) {
       const r = noBtn.getBoundingClientRect();
       const cx = r.left + r.width / 2;
       const cy = r.top + r.height / 2;
       const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
-      if (dist < 90) flee(e.clientX, e.clientY);
+      if (dist < 110) flee(e.clientX, e.clientY);
     });
 
-    // Hard fallbacks in case a click/tap ever lands on it.
+    // Hard fallbacks for touch screens / any stray click.
     noBtn.addEventListener('mouseover', function (e) { flee(e.clientX, e.clientY); });
     noBtn.addEventListener('click', function (e) {
       e.preventDefault();
